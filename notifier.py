@@ -4,6 +4,7 @@
 from config import *
 
 import json
+import sys
 import time
 import urllib2
 
@@ -14,6 +15,12 @@ from twilio.rest import TwilioRestClient
 # Storing all the events
 STORAGE = []
 
+# Limit for sending SMS
+SMS_TIMEOUT = 60 * 60
+
+# Fix utf8
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class Event():
     
@@ -95,7 +102,7 @@ class Notifier():
                     # Get the number of seconds until the registration opens
                     seconds_until_open = (reg_open_datetime - datetime.now()).total_seconds()
                     
-                    if seconds_until_open <= (60 * 60): # One hour
+                    if seconds_until_open <= SMS_TIMEOUT:
                         self.notify(event)
     
     
@@ -105,7 +112,7 @@ class Notifier():
         
         # Send the SMS
         client.messages.create(
-            body='Påmelding til ' + event.title + ' åpner ' + event.reg_open,
+            body='PÃ¥melding til ' + event.title + ' Ã¥pner om en time!',
             to=NUMBER_TO,
             from_=NUMBER_FROM,
         )
@@ -118,9 +125,6 @@ class Notifier():
     
     
     def run(self):
-        # Debug line
-        print 'Online Notifier Daemon Started'
-        
         # Do this as long as the daemon is running
         while True:
             # Fetch the data from the API
