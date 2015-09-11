@@ -74,8 +74,9 @@ class Notifier():
                 new_event.type = api_event['event_type']
                 new_event.reg_open = api_event['attendance_event']['registration_start']
                 
-                # Add to storage list
-                STORAGE.append(new_event)
+                # Add to storage list if not already present
+                if new_event not in STORAGE:
+                    STORAGE.append(new_event)
     
     
     def check_status(self):
